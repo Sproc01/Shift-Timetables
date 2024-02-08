@@ -152,7 +152,5 @@ cython_debug/
 #.idea/
 
 **/.DS_Store
-.DS_Store
 
-**/.ods
-.ods
+**/FEBBRAIO 2024.ods
