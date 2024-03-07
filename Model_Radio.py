@@ -113,24 +113,24 @@ if __name__ == '__main__':
     res = opt.solve(tee=True)
     matrix=[ [ '' for i in range(len(instance.Days)) ] for j in range(2) ]
     Days=[]
-    output=open('output_Radio.txt','w')
+    output=open('output_Radio.csv','w')
     baseFmtStr = "{{{{:{{pad}}>{num}}}}}"
-    output.write('Sunday: ')
+    output.write('Sunday; ')
     for d in instance.Sunday:
-        output.write(baseFmtStr.format(num=2).format(pad=' ').format(str(d))+'|')
+        output.write(baseFmtStr.format(num=2).format(pad=' ').format(str(d))+';')
     output.write('\n')
     output.write('\n')
     for d in instance.Days:
-        output.write(baseFmtStr.format(num=2).format(pad=' ').format(str(d))+'|')
+        output.write(baseFmtStr.format(num=2).format(pad=' ').format(str(d))+';')
     output.write('\n')
     for p in instance.People:
         for d in instance.Days:
             rest=True
             for pd in instance.PartDays:
                 if value(instance.x[pd,d,p])==1:
-                    output.write(' '+pd+'|')
+                    output.write(' '+pd+';')
                     rest=rest and False
             if rest:
-                output.write(' R|')
+                output.write(' R;')
         output.write('\n')
     output.close()
