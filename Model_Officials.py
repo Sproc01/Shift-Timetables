@@ -12,7 +12,10 @@ def constr_rule0(model, s, j): #one shift per day
 
 def constr_rule1(model, s, j):#6 days at work every week
     if s in model.Monday:
-        return sum(model.x['M',k,j]+model.x['P', k, j] for k in [s,s+1,s+2,s+3,s+4,s+5,s+6])==6
+        if s==29:
+            return Constraint.Skip
+        else:
+            return sum(model.x['M',k,j]+model.x['P', k, j] for k in [s,s+1,s+2,s+3,s+4,s+5,s+6])==6
     else:
         return Constraint.Skip
     
@@ -30,7 +33,10 @@ def constr_rule4(model,j):#eleven afternoons each month
 
 def constr_rule5(model,s, j): #at least two afternoon each week
     if s in model.Monday:
-        return sum(model.x['P', k, j] for k in [s,s+1,s+2,s+3,s+4,s+5,s+6])>=2
+        if s==29:
+            return Constraint.Skip
+        else:
+            return sum(model.x['P', k, j] for k in [s,s+1,s+2,s+3,s+4,s+5,s+6])>=2
     else:
         return Constraint.Skip
     
@@ -135,13 +141,6 @@ def constr_rule22(model):
 def constr_rule23(model):
     return sum(model.x['M',k,8] for k in model.Sunday)==1
 
-#first week: working days
-def constr_rule24(model,s ,j):
-    if s==1:
-        return sum(model.x['M',k,j]+model.x['P',k,j] for k in [s,s+1,s+2])==2
-    else:
-        return Constraint.Skip
-
 def buildmodel():
     model=AbstractModel()
     model.Days = Set()
@@ -184,7 +183,6 @@ def buildmodel():
     model.constrs21 = Constraint(rule=constr_rule21)
     model.constrs22 = Constraint(rule=constr_rule22)
     model.constrs23 = Constraint(rule=constr_rule23)
-    model.constrs24 = Constraint(model.Days, model.People, rule=constr_rule24)
     model.constrs25 = Constraint(model.People, rule=constr_rule25)
     model.constrs26 = Constraint(model.People, rule=constr_rule26)
     return model

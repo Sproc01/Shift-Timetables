@@ -9,13 +9,19 @@ def constr_rule1(model, s, j): #constraint only one shift per day
 
 def constr_rule2(model,s,j): #constraint exactly 3 mornings a week 
     if s in model.Monday:
-        return sum(model.x['M',i,j] for i in [s, s+1, s+2,s+3, s+4, s+5, s+6])==3
+        if s==29:
+            return Constraint.Skip
+        else:
+            return sum(model.x['M',i,j] for i in [s, s+1, s+2,s+3, s+4, s+5, s+6])==3
     else:
         return Constraint.Skip
 
 def constr_rule3(model, s, j): #constraint exactly 3 afternoons a week 
     if s in model.Monday:
-        return sum(model.x['P',i,j] for i in [s, s+1, s+2,s+3, s+4, s+5, s+6])==3
+        if s==29:
+            return Constraint.Skip
+        else:
+            return sum(model.x['P',i,j] for i in [s, s+1, s+2,s+3, s+4, s+5, s+6])==3
     else:
         return Constraint.Skip
 
@@ -50,25 +56,32 @@ def constr_rule9(model, s):
 
 def constr_rule14(model, s, j): #constraint same shift after the weekend
     if s in model.Monday:
-        return model.x['M',s,j]==model.x['M',s-3,j]
+        if s==1:
+            return Constraint.Skip
+        else:
+            return model.x['M',s,j]==model.x['M',s-3,j]
     else:
         return Constraint.Skip
     
 def constr_rule15(model, s, j): #constraint same shift for 3 days in a row
     if s in model.Monday:
-        return 0.5*(model.x['M',s,j]+model.x['M',s+1,j])==model.x['M',s+2,j]
+        if s==29:
+            return model.x['M',s,j]==model.x['M',s+1,j]
+        else:
+            return 0.5*(model.x['M',s,j]+model.x['M',s+1,j])==model.x['M',s+2,j]
     else:
         return Constraint.Skip
 
-#constraint from previous month(february)
+#constraint from previous month(March) shift for first week of April
 def constr_rule10(model):
-    return sum(model.x['P',s,1] for s in [1, 2, 3])==2
+    return sum(model.x['P',s,1] for s in [1, 2, 3])==3
 
 def constr_rule11(model):
-    return sum(model.x['M',s,2] for s in [1, 2, 3])==2
+    return sum(model.x['M',s,2] for s in [1, 2, 3])==3
 
+#constraint from previous month(March) Sunday shift
 def constr_rule12(model):
-    return sum(model.x['P',s,1] for s in model.Sunday)==1
+    return sum(model.x['M',s,1] for s in model.Sunday)==1
 	
 def constr_rule13(model):
     return sum(model.x['P',s,2] for s in model.Sunday)==1

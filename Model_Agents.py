@@ -12,7 +12,10 @@ def constr_rule0(model, s, j): #one shift per day
 
 def constr_rule1(model, s, j):#6 days at work every week
     if s in model.Monday:
-        return sum(model.x['M',k,j]+model.x['P', k, j] for k in [s,s+1,s+2,s+3,s+4,s+5,s+6])==6
+        if s==29:
+            return Constraint.Skip
+        else:
+            return sum(model.x['M',k,j]+model.x['P', k, j] for k in [s,s+1,s+2,s+3,s+4,s+5,s+6])==6
     else:
         return Constraint.Skip
     
@@ -30,7 +33,10 @@ def constr_rule4(model,j):#eleven afternoons each month
 
 def constr_rule5(model,s, j): #at least two afternoon each week
     if s in model.Monday:
-        return sum(model.x['P', k, j] for k in [s,s+1,s+2,s+3,s+4,s+5,s+6])>=2
+        if s==29:
+            return Constraint.Skip
+        else:
+            return sum(model.x['P', k, j] for k in [s,s+1,s+2,s+3,s+4,s+5,s+6])>=2
     else:
         return Constraint.Skip
     
@@ -106,26 +112,22 @@ def constr_rule15(model, s, j): #friday
 #constr from previous month
 #shift on sunday
 def constr_rule16(model):
-    return sum(model.x['P',k,1] for k in model.Sunday)==1
+    return sum(model.x['M',k,1] for k in model.Sunday)==1
 
 def constr_rule17(model):
-    return sum(model.x['M',k,2] for k in model.Sunday)==1
+    return sum(model.x['P',k,2] for k in model.Sunday)==1
 
 def constr_rule18(model):
-    return sum(model.x['M',k,3] for k in model.Sunday)==1
+    return sum(model.x['P',k,3] for k in model.Sunday)==1
 
 def constr_rule19(model):
-    return sum(model.x['M',k,4] for k in model.Sunday)==1
+    return sum(model.x['P',k,4] for k in model.Sunday)==1
 
 def constr_rule20(model):
     return sum(model.x['P',k,5] for k in model.Sunday)==1
 
-#first week: working days
-def constr_rule24(model,s ,j):
-    if s==1:
-        return sum(model.x['M',k,j]+model.x['P',k,j] for k in [s,s+1,s+2])==2
-    else:
-        return Constraint.Skip
+def constr_rule21(model):
+    return sum(model.x['M',k,6] for k in model.Sunday)==1
 
 def buildmodel():
     model=AbstractModel()
@@ -165,7 +167,6 @@ def buildmodel():
     model.constrs18 = Constraint(rule=constr_rule18)
     model.constrs19 = Constraint(rule=constr_rule19)
     model.constrs20 = Constraint(rule=constr_rule20)
-    model.constrs24 = Constraint(model.Days, model.People, rule=constr_rule24)
     model.constrs25 = Constraint(model.People, rule=constr_rule25)
     model.constrs26 = Constraint(model.People, rule=constr_rule26)
     return model
@@ -193,7 +194,10 @@ if __name__ == '__main__':
             rest=True
             for pd in instance.PartDays:
                 if value(instance.x[pd,d,p])==1:
-                    output.write(baseFmtStr.format(num=2).format(pad=' ').format(str(pd))+';')
+                    if pd=='M' and d not in instance.Sunday:
+                        output.write(' ;')
+                    else:
+                        output.write(baseFmtStr.format(num=2).format(pad=' ').format(str(pd))+';')
                     rest=rest and False
             if rest:
                 output.write(' R;')
