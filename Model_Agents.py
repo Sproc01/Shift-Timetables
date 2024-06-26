@@ -1,5 +1,8 @@
 from pyomo.environ import *
 from pyomo.opt import SolverFactory
+import sys
+sys.path.append('.')
+from OutputFun import printOut
 
 def obj_rule(model):
     if len(model.Sunday)==5:
@@ -179,27 +182,4 @@ if __name__ == '__main__':
     instance = model.create_instance(s)
     opt.set_instance(instance)
     res = opt.solve(tee=True)
-    output=open('output_Agents.csv','w')
-    baseFmtStr = "{{{{:{{pad}}>{num}}}}}"
-    output.write('Sunday;')
-    for d in instance.Sunday:
-        output.write(baseFmtStr.format(num=2).format(pad=' ').format(str(d))+';')
-    output.write('\n')
-    output.write('\n')
-    for d in instance.Days:
-        output.write(baseFmtStr.format(num=2).format(pad=' ').format(str(d))+';')
-    output.write('\n')
-    for p in instance.People:
-        for d in instance.Days:
-            rest=True
-            for pd in instance.PartDays:
-                if value(instance.x[pd,d,p])==1:
-                    if pd=='M' and d not in instance.Sunday:
-                        output.write(' ;')
-                    else:
-                        output.write(baseFmtStr.format(num=2).format(pad=' ').format(str(pd))+';')
-                    rest=rest and False
-            if rest:
-                output.write(' R;')
-        output.write('\n')
-    output.close()
+    printOut('output_Agents.csv', instance, True)

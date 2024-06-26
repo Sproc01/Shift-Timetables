@@ -1,5 +1,8 @@
 from pyomo.environ import *
 from pyomo.opt import SolverFactory
+import sys
+sys.path.append('.')
+from OutputFun import printOut
 
 def obj_rule(model): #objective function
     return 0
@@ -117,33 +120,10 @@ def buildmodel():
     return model
 
 if __name__ == '__main__':
-    import sys
     model = buildmodel()
     opt = SolverFactory('cplex_persistent')
     s=sys.argv[1]
     instance = model.create_instance(s)
     opt.set_instance(instance)
     res = opt.solve(tee=True)
-    matrix=[ [ '' for i in range(len(instance.Days)) ] for j in range(2) ]
-    Days=[]
-    output=open('output_Radio.csv','w')
-    baseFmtStr = "{{{{:{{pad}}>{num}}}}}"
-    output.write('Sunday; ')
-    for d in instance.Sunday:
-        output.write(baseFmtStr.format(num=2).format(pad=' ').format(str(d))+';')
-    output.write('\n')
-    output.write('\n')
-    for d in instance.Days:
-        output.write(baseFmtStr.format(num=2).format(pad=' ').format(str(d))+';')
-    output.write('\n')
-    for p in instance.People:
-        for d in instance.Days:
-            rest=True
-            for pd in instance.PartDays:
-                if value(instance.x[pd,d,p])==1:
-                    output.write(' '+pd+';')
-                    rest=rest and False
-            if rest:
-                output.write(' R;')
-        output.write('\n')
-    output.close()
+    printOut('output_Radio.csv', instance, True)
