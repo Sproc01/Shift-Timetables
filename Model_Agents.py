@@ -175,7 +175,6 @@ def buildmodel():
     return model
 
 if __name__ == '__main__':
-    import sys
     model = buildmodel()
     opt = SolverFactory('cplex_persistent')
     s=sys.argv[1]
