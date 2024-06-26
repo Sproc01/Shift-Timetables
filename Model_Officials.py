@@ -192,11 +192,15 @@ def buildmodel():
     return model
 
 if __name__ == '__main__':
+    argc = len(sys.argv)
+    if argc != 1:
+        print('Usage: python3 model_Officials.py <datafile>')
+        sys.exit(1)
     model = buildmodel()
     opt = SolverFactory('cplex_persistent')
     s=sys.argv[1]
     instance = model.create_instance(s)
     opt.set_instance(instance)
     res = opt.solve(tee=True)
-    printOut('output_Officials.csv', instance, False)
+    printOut('Output/output_Officials.csv', instance, False)
     
