@@ -193,7 +193,7 @@ def buildmodel():
 
 if __name__ == '__main__':
     argc = len(sys.argv)
-    if argc != 1:
+    if argc != 2:
         print('Usage: python3 model_Officials.py <datafile>')
         sys.exit(1)
     model = buildmodel()
